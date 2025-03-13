@@ -106,20 +106,6 @@
           .catch(error => console.error('Error:', error));
 
 
-          document.addEventListener('DOMContentLoaded', () => {
-  fetch(`fetch_messages.php?sender_id=${sender_id}&receiver_id=${receiver_id}`)
-    .then(response => response.json())
-    .then(messages => {
-      messages.forEach(msg => {
-        const messageDisplay = document.createElement('p');
-        messageDisplay.classList.add('message', msg.sender_id == sender_id ? 'sent' : 'received');
-        messageDisplay.textContent = `${msg.sender_id == sender_id ? 'You' : 'Sender'}: ${msg.message}`;
-        outputElement.appendChild(messageDisplay);
-      });
-    })
-    .catch(error => console.error('Error fetching messages:', error));
-});
-
 
 
         const messageDisplay = document.createElement('p');
