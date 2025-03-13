@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $sender_id = $_SESSION['user_id'];
-$result = $conn->query("SELECT * FROM users WHERE id != $sender_id");
+$result = $conn->query("SELECT * FROM contacts WHERE user_id = $sender_id");
 ?>
 
 <!DOCTYPE html>
@@ -156,12 +156,12 @@ $result = $conn->query("SELECT * FROM users WHERE id != $sender_id");
 
     <div class="container">
         <h2>Users List</h2>
-        <a href="register.php" class="add-user">Add New User 
+        <a href="contact.php" class="add-user">Add New User 
         <i class="fas fa-plus"></i>
         </a>
         
 
-        <!-- <div class="users-container">
+        <div class="users-container">
             <?php while ($row = $result->fetch_assoc()): ?>
                 <div class="user-card">
                     <p class="username"><?= htmlspecialchars($row['username']) ?></p>
@@ -180,7 +180,7 @@ $result = $conn->query("SELECT * FROM users WHERE id != $sender_id");
                     </div>
                 </div>
             <?php endwhile; ?>
-        </div> -->
+        </div>
 
     </div>
 
