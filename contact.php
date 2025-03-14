@@ -14,33 +14,30 @@ $success = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = trim($_POST['name']);
-    $number = trim($_POST['number']);
+    $contact_number = trim($_POST['contact_number']);
     $user_id = trim($_POST['user_id']);
 
     // Ensure fields are not empty
-    if (empty($name) || empty($number)||empty($user_id)) {
+    if (empty($name) || empty($contact_number)||empty($user_id)) {
         $errors[] = "Please fill in all fields.";
     } else {
         // Check if contact already exists
-        $checkStmt = $conn->prepare("SELECT id FROM contacts WHERE name = ? AND `number` = ?");
+        $checkStmt = $conn->prepare("SELECT id FROM contacts WHERE name = ? AND `contact_number` = ?");
         if (!$checkStmt) {
             die("Error preparing statement: " . $conn->error);
         }
-        $checkStmt->bind_param("ss", $name, $number);
+        $checkStmt->bind_param("ss", $name, $contact_number);
         $checkStmt->execute();
         $checkStmt->store_result();
 
         if ($checkStmt->num_rows > 0) {
             $success = 'Contact already exists!';
         } else {
-            // Prepare statement for inserting contact without email
-            $stmt = $conn->prepare("INSERT INTO contacts (`name`, `number`,`user_id`) VALUES (?, ?,?)");
+            $stmt = $conn->prepare("INSERT INTO contacts (`name`, `contact_number`,`user_id`) VALUES (?, ?,?)");
             if (!$stmt) {
                 die("Error preparing statement: " . $conn->error);
             }
-
-            // Bind parameters
-            $stmt->bind_param("sss", $name, $number,$user_id);
+            $stmt->bind_param("sss", $name, $contact_number,$user_id);
 
             // Check if execution was successful
             if ($stmt->execute()) {
@@ -59,12 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $checkStmt->close();
     }
 
-    if (!empty($errors)) {
-        // Output the errors (you could display them in a better way, e.g. inside an HTML element)
-        foreach ($errors as $error) {
-            echo "<p style='color:red;'>$error</p>";
-        }
-    }
+   
 
     $conn->close();
 }
@@ -96,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <label>Name:</label>
             <input type="text" name="name" required>
             <label>Number:</label>
-            <input type="number" name="number" required>
+            <input type="number" name="contact_number" required>
             <input type="hidden" name="user_id" value="<?=$user_id?>">
 
             <button type="submit">Save</button>

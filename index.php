@@ -21,7 +21,7 @@ $result = $conn->query("SELECT * FROM contacts WHERE user_id = $sender_id");
     <title>Users List</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-    <link rel="stylesheet" href="styles.css">
+    <!-- <link rel="stylesheet" href="styles.css"> -->
     <style>
        * {
             box-sizing: border-box;
@@ -164,11 +164,10 @@ $result = $conn->query("SELECT * FROM contacts WHERE user_id = $sender_id");
         <div class="users-container">
             <?php while ($row = $result->fetch_assoc()): ?>
                 <div class="user-card">
-                    <p class="username"><?= htmlspecialchars($row['username']) ?></p>
-                    <p class="email"><?= htmlspecialchars($row['email']) ?></p>
-                    <p class="number"><?= htmlspecialchars($row['number']) ?></p>
+                    <p class="name"><?= htmlspecialchars($row['name']) ?></p>
+                    <p class="contact_number"><?= htmlspecialchars($row['contact_number']) ?></p>
                     <div class="actions">
-                        <a href="chat.php?receiver_id=<?= $row['id'] ?>&sender_id=<?= $sender_id ?>" class="chat">
+                        <a href="chat.php?receiver_number=<?= $row['id'] ?>&sender_id=<?= $sender_id ?>" class="chat">
                             <i class="fas fa-comments"></i>
                         </a>
                         <a href="update.php?id=<?= $row['id'] ?>" class="edit">

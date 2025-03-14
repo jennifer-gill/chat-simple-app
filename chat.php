@@ -90,6 +90,7 @@
       <h2>Send a Message</h2>
 
       <input type="text" id="message" placeholder="Enter your message">
+      <input type="hidden" name="receiver_number" value="receiver_number">
       <button id="send-message" type="button">Send Message</button>
     </div>
 
@@ -105,7 +106,8 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const sender_id = urlParams.get('sender_id');
-    const receiver_id = urlParams.get('receiver_id');
+    const receive_number = urlParams.get('receiver_number');
+    const receiver_number = document.getElementById('receiver_number');
 
     ws.onopen = () => {
       console.log('Connected to the WebSocket server');
@@ -129,20 +131,21 @@
     sendMessageButton.onclick = (e) => {
       e.preventDefault();
       const message = messageInput.value;
+      console.log("Sending message to receiver_number: " + receiver_number);
 
       if (message) {
         const timestamp = new Date().toLocaleString();
         ws.send(JSON.stringify({
           type: 'private',
           from: sender_id,
-          to: receiver_id,
+          to: receiver_number,
           message: message
         }));
 
         const payload = {
           sender_id,
-          receiver_id,
-          message
+          receiver_number,
+          message,
         };
 
         fetch('save_message.php', {
@@ -162,7 +165,7 @@
         })
         .catch(error => console.error('Error:', error));
 
-        displayMessage(receiver_id, message, 'sent', timestamp);
+        displayMessage(receiver_number, message, 'sent', timestamp);
 
         messageInput.value = '';
       } else {
@@ -174,10 +177,10 @@
       console.log('Disconnected from the WebSocket server');
     };
 
-    function displayMessage(sender, message, type, timestamp = '') {
+    function displayMessage(receiver_number, message, type, timestamp = '') {
       const messageDisplay = document.createElement('p');
       messageDisplay.classList.add('message', type);
-      messageDisplay.textContent = `${sender}: ${message}`;
+      messageDisplay.textContent = ` ${message}`;
 
       if (timestamp) {
         const timeDisplay = document.createElement('span');
