@@ -31,3 +31,41 @@ CREATE TABLE messages (
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+
+
+17-03-2025
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    contact_number VARCHAR(255) NOT NULL, -- Renamed from number to contact_number
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+
+CREATE TABLE contacts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,  -- This references users.id
+    name VARCHAR(255) NOT NULL,
+    contact_number VARCHAR(20) NOT NULL,  -- Renamed from phone to contact_number
+    FOREIGN KEY (user_id) REFERENCES users(id) 
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE
+);
+
+
+
+
+CREATE TABLE messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_number VARCHAR(191) NOT NULL,
+    receiver_number VARCHAR(191) NOT NULL,  
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
