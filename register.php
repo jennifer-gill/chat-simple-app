@@ -8,32 +8,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
-    $number = trim($_POST['number']);
+    $contact_number = trim($_POST['contact_number']);
 
-    if (empty($username) || empty($email) || empty($password) || empty($number) ) {
+    if (empty($username) || empty($email) || empty($password) || empty($contact_number) ) {
         $errors[] = "Please fill in all fields.";
     }
 
     if (empty($errors)) {
-        $checkStmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+        $checkStmt = $conn->prepare("SELECT id FROM users WHERE contact_number = ?");
         if (!$checkStmt) {
             die("Error preparing statement: " . $conn->error);
         }
 
-        $checkStmt->bind_param("s", $email);
+        $checkStmt->bind_param("s", $contact_number);
         $checkStmt->execute();
         $checkStmt->store_result();
 
         if ($checkStmt->num_rows > 0) {
             $errors[] = 'User already exists.';
         } else {
-            $stmt = $conn->prepare("INSERT INTO users (username, email, password,number) VALUES (?, ?, ?,?)");
+            $stmt = $conn->prepare("INSERT INTO users (username, email, password,contact_number) VALUES (?, ?, ?,?)");
             if (!$stmt) {
                 die("Error preparing insert statement: " . $conn->error);
             }
 
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $stmt->bind_param("ssss", $username, $email, $hashed_password,$number);
+            $stmt->bind_param("ssss", $username, $email, $hashed_password,$contact_number);
 
             if ($stmt->execute()) {
                 $success = 'Registration successful!';
@@ -160,8 +160,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <input type="password" id="password" name="password" class="underline" required><br>
 
       
-      <label for="number">Number:</label>
-      <input type="number" id="number" name="number" class="underline" required><br>
+      <label for="contact_number">Contact_Number:</label>
+      <input type="contact_number" id="contact_number" name="contact_number" class="underline" required><br>
 
       <button type="submit">Register</button>
 

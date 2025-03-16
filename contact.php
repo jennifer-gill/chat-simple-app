@@ -18,26 +18,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_id = trim($_POST['user_id']);
 
     // Ensure fields are not empty
-    if (empty($name) || empty($contact_number)||empty($user_id)) {
+    if (empty($name) || empty($contact_number) || empty($user_id)) {
         $errors[] = "Please fill in all fields.";
     } else {
         // Check if contact already exists
-        $checkStmt = $conn->prepare("SELECT id FROM contacts WHERE name = ? AND `contact_number` = ?");
+        $checkStmt = $conn->prepare("SELECT id FROM contacts WHERE user_id = ? AND name = ? AND contact_number = ?");
         if (!$checkStmt) {
             die("Error preparing statement: " . $conn->error);
         }
-        $checkStmt->bind_param("ss", $name, $contact_number);
+        $checkStmt->bind_param("iss", $user_id, $name, $contact_number);
         $checkStmt->execute();
         $checkStmt->store_result();
 
         if ($checkStmt->num_rows > 0) {
-            $success = 'Contact already exists!';
+            $errors[] = 'Contact already exists!';
         } else {
-            $stmt = $conn->prepare("INSERT INTO contacts (`name`, `contact_number`,`user_id`) VALUES (?, ?,?)");
+            // Insert new contact
+            $stmt = $conn->prepare("INSERT INTO contacts (`user_id`, `name`, `contact_number`) VALUES (?, ?, ?)");
             if (!$stmt) {
                 die("Error preparing statement: " . $conn->error);
             }
-            $stmt->bind_param("sss", $name, $contact_number,$user_id);
+            $stmt->bind_param("iss", $user_id, $name, $contact_number);
 
             // Check if execution was successful
             if ($stmt->execute()) {
@@ -49,20 +50,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 $errors[] = "Error saving contact: " . $stmt->error;
             }
-
             $stmt->close();
         }
-
         $checkStmt->close();
     }
-
-   
-
     $conn->close();
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -88,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <label>Name:</label>
             <input type="text" name="name" required>
             <label>Number:</label>
-            <input type="number" name="contact_number" required>
+            <input type="text" name="contact_number" required>
             <input type="hidden" name="user_id" value="<?=$user_id?>">
 
             <button type="submit">Save</button>

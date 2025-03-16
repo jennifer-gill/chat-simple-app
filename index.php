@@ -8,8 +8,10 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$sender_id = $_SESSION['user_id'];
-$result = $conn->query("SELECT * FROM contacts WHERE user_id = $sender_id");
+$user_id = $_SESSION['user_id'];
+$contact_number = $_SESSION['contact_number'];
+
+$result = $conn->query("SELECT * FROM contacts WHERE user_id = $user_id");
 ?>
 
 <!DOCTYPE html>
@@ -156,6 +158,7 @@ $result = $conn->query("SELECT * FROM contacts WHERE user_id = $sender_id");
 
     <div class="container">
         <h2>Users List</h2>
+        <h1><?= $user_id ?></h1>
         <a href="contact.php" class="add-user">Add New User 
         <i class="fas fa-plus"></i>
         </a>
@@ -167,7 +170,7 @@ $result = $conn->query("SELECT * FROM contacts WHERE user_id = $sender_id");
                     <p class="name"><?= htmlspecialchars($row['name']) ?></p>
                     <p class="contact_number"><?= htmlspecialchars($row['contact_number']) ?></p>
                     <div class="actions">
-                        <a href="chat.php?receiver_number=<?= $row['id'] ?>&sender_id=<?= $sender_id ?>" class="chat">
+                        <a href="chat.php?receiver_number=<?= $row['contact_number'] ?>&sender_number=<?= $contact_number ?>" class="chat">
                             <i class="fas fa-comments"></i>
                         </a>
                         <a href="update.php?id=<?= $row['id'] ?>" class="edit">

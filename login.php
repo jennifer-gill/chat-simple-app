@@ -10,17 +10,17 @@ if (isset($_SESSION['user_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'];
+    $contact_number = $_POST['contact_number'];
     $password = $_POST['password'];
 
    
-    $email = htmlspecialchars($email);
+    $contact_number = htmlspecialchars($contact_number);
     $password = htmlspecialchars($password);
 
   
-    $query = "SELECT id, username, password FROM users WHERE email = ?";
+    $query = "SELECT * FROM users WHERE contact_number = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param('s', $email);  
+    $stmt->bind_param('s', $contact_number);  
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -29,6 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
+            $_SESSION['contact_number'] = $user['contact_number'];
+
             echo 'Login successful! Redirecting...';
             header('Location: index.php');
             exit(); 
@@ -36,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Invalid password.';
         }
     } else {
-        $error = 'email does not exist.';
+        $error = 'number does not exist.';
     }
 }
 ?>
@@ -72,37 +74,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         label {
-            font-size: 14px;
-            color: #333;
-            text-align: left;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        input[type="email"],
-        input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        button {
-            background-color: #5f9ea0;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-        }
-
-        button:hover {
-            background-color: #4f8c7b;
-        }
+      font-size: 14px;
+      color: #333;
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      outline: none;
+      background-color: #f9f9f9;
+      margin-bottom: 15px;
+      transition: border-bottom 0.3s ease;
+    }
+    input:focus {
+      border-bottom: 2px solid #5f9ea0;
+    }
+    .underline {
+      border-bottom: 2px solid #5f9ea0;
+      background: none;
+      padding: 10px 5px;
+      font-size: 16px;
+      color: #333;
+    }
+    button {
+      background-color: #5f9ea0;
+      color: white;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #4e8a7b;
+    }
 
         .error-message {
             color: red;
@@ -116,11 +126,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="login-container">
         <h2>Login</h2>
         <form method="POST" action="login.php">
-            <label for="email">Email:</label>
-            <input type="email" name="email" required><br>
+        <label for="contact_number">Contact_Number:</label>
+      <input type="contact_number" id="contact_number" name="contact_number" class="underline" required><br>
+
 
             <label for="password">Password:</label>
-            <input type="password" name="password" required><br>
+            <input type="password" name="password"  class="underline" required><br>
 
             <button type="submit">Login</button>
         </form>

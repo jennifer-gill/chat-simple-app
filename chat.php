@@ -52,18 +52,17 @@
 
     #output {
       margin-top: 20px;
-      width: 300px;
+      width: 100%;
       max-height: 400px;
       overflow-y: auto;
       border-top: 1px solid #ddd;
     }
 
     .message {
-      background-color: #e0f7fa;
+      background-color: #008ea1;
       padding: 10px;
       border-radius: 4px;
       margin-bottom: 10px;
-      max-width: 80%;
       word-wrap: break-word;
     }
 
@@ -75,6 +74,14 @@
     .received {
       background-color: #f1f8e9;
     }
+
+    .right {
+      text-align: right;
+    }
+    .right {
+      text-align: left;
+    }
+
 
     .message-time {
       font-size: 0.8em;
@@ -90,7 +97,6 @@
       <h2>Send a Message</h2>
 
       <input type="text" id="message" placeholder="Enter your message">
-      <input type="hidden" name="receiver_number" value="receiver_number">
       <button id="send-message" type="button">Send Message</button>
     </div>
 
@@ -105,92 +111,96 @@
     const outputElement = document.getElementById('output');
 
     const urlParams = new URLSearchParams(window.location.search);
-    const sender_id = urlParams.get('sender_id');
-    const receive_number = urlParams.get('receiver_number');
-    const receiver_number = document.getElementById('receiver_number');
+    const sender_number = urlParams.get('sender_number');
+    const receiver_number = urlParams.get('receiver_number');
+
+    // fetch('getReceiverNumber.php', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/x-www-form-urlencoded'
+    //     },
+    //     body: new URLSearchParams({
+    //       sender_number: sender_number
+    //     }).toString() // Send the sender's number
+    //   })
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     console.log(data);
+    //   })
+    //   .catch(error => console.error('Error:', error));
 
     ws.onopen = () => {
       console.log('Connected to the WebSocket server');
       ws.send(JSON.stringify({
         type: 'clientId',
-        clientId: sender_id
+        clientId: sender_number
       }));
     };
 
     ws.onmessage = (message) => {
       const decodedMessage = JSON.parse(message.data);
+      console.log(decodedMessage);
       if (decodedMessage.type === 'clientIdAck') {
         messageContainer.style.display = 'block';
       } else if (decodedMessage.type === 'private') {
-        displayMessage(decodedMessage.from, decodedMessage.message, 'received');
-      } else if (decodedMessage.type === 'error') {
-        displayMessage('Error', decodedMessage.message, 'error');
+        const messageDisplay = document.createElement('p');
+        messageDisplay.classList.add('message', decodedMessage.from == null ? "left" : 'right');
+        messageDisplay.textContent = ` ${decodedMessage.from}`;
+        outputElement.appendChild(messageDisplay);
       }
     };
 
     sendMessageButton.onclick = (e) => {
       e.preventDefault();
       const message = messageInput.value;
-      console.log("Sending message to receiver_number: " + receiver_number);
+
+      // Payload to save the message in the database
+      const payload = {
+        sender_number,
+        receiver_number,
+        message,
+      };
 
       if (message) {
-        const timestamp = new Date().toLocaleString();
-        ws.send(JSON.stringify({
-          type: 'private',
-          from: sender_id,
-          to: receiver_number,
-          message: message
-        }));
 
-        const payload = {
-          sender_id,
-          receiver_number,
-          message,
-        };
+        const messageDisplay = document.createElement('p');
+        messageDisplay.classList.add('message');
+        messageDisplay.textContent = ` ${message}`;
+        outputElement.appendChild(messageDisplay);
 
         fetch('save_message.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: new URLSearchParams(payload).toString()
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === 'success') {
-            console.log('Message stored successfully');
-          } else {
-            console.error('Failed to store message:', data.message);
-          }
-        })
-        .catch(error => console.error('Error:', error));
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams(payload).toString()
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
 
-        displayMessage(receiver_number, message, 'sent', timestamp);
-
-        messageInput.value = '';
+              ws.send(JSON.stringify({
+                type: 'private',
+                from: sender_number,
+                to: receiver_number,
+                message: message,
+                me: true,
+              }));
+              console.log('Message stored successfully');
+            } else {
+              console.error('Failed to store message:', data.message);
+            }
+          })
+          .catch(error => console.error('Error:', error));
       } else {
         alert('Please fill in both fields.');
       }
     };
 
+
     ws.onclose = () => {
       console.log('Disconnected from the WebSocket server');
     };
-
-    function displayMessage(receiver_number, message, type, timestamp = '') {
-      const messageDisplay = document.createElement('p');
-      messageDisplay.classList.add('message', type);
-      messageDisplay.textContent = ` ${message}`;
-
-      if (timestamp) {
-        const timeDisplay = document.createElement('span');
-        timeDisplay.classList.add('message-time');
-        timeDisplay.textContent = `(${timestamp})`;
-        messageDisplay.appendChild(timeDisplay);
-      }
-
-      outputElement.appendChild(messageDisplay);
-    }
   </script>
 </body>
 

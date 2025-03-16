@@ -1,15 +1,15 @@
 <?php
 include 'db.php';
 
-$sender_id = $_GET['sender_id'] ?? '';
-$receiver_id = $_GET['receiver_id'] ?? '';
+$sender_number = $_GET['sender_number'] ?? '';
+$receiver_number = $_GET['receiver_number'] ?? '';
 
-if ($sender_id && $receiver_id) {
-    $stmt = $conn->prepare("SELECT sender_id, receiver_id, message FROM messages WHERE 
-        (sender_id = ? AND receiver_id = ?) 
-        OR (sender_id = ? AND receiver_id = ?) 
+if ($sender_number && $receiver_number) {
+    $stmt = $conn->prepare("SELECT sender_number, receiver_number, message FROM messages WHERE 
+        (sender_number = ? AND receiver_number = ?) 
+        OR (sender_number = ? AND receiver_number= ?) 
         ORDER BY id ASC");
-    $stmt->bind_param("iiii", $sender_id, $receiver_id, $receiver_id, $sender_id);
+    $stmt->bind_param("ssss", $sender_number, $receiver_number, $receiver_number, $sender_number);
     $stmt->execute();
     $result = $stmt->get_result();
 
