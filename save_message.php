@@ -1,10 +1,9 @@
 <?php
 include 'db.php';
-// Get data from AJAX request
 $sender_number = $_POST['sender_number'] ?? null;
 $receiver_number = $_POST['receiver_number'] ?? null;
 $message = $_POST['message'] ?? null;
-$name = "Unknown"; // Default name
+$name = "Unknown"; 
 
 if ($sender_number && $receiver_number && $message) {
     $stmt = $conn->prepare("INSERT INTO messages (sender_number, receiver_number, message) VALUES (?, ?, ?)");

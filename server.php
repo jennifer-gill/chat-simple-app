@@ -18,7 +18,6 @@ class ChatServer implements MessageComponentInterface {
         $this->clients = new SplObjectStorage();
         $this->users = [];
 
-        // Database connection
         $dsn = "mysql:host=localhost;dbname=my_data_base;charset=utf8mb4";
         $username = "root";
         $password = "root";

@@ -22,8 +22,6 @@ $result = $conn->query("SELECT * FROM contacts WHERE user_id = $user_id");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users List</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
-    <!-- <link rel="stylesheet" href="styles.css"> -->
     <style>
        * {
             box-sizing: border-box;
@@ -72,7 +70,6 @@ $result = $conn->query("SELECT * FROM contacts WHERE user_id = $user_id");
             background: #4a8283;
         }
 
-        /* User Cards */
         .users-container {
             display: flex;
             flex-wrap: wrap;
@@ -108,8 +105,6 @@ $result = $conn->query("SELECT * FROM contacts WHERE user_id = $user_id");
             color: #e0e0e0;
             margin-bottom: 10px;
         }
-
-        /* Button Styles */
         .actions {
             display: flex;
             justify-content: center;

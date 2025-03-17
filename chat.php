@@ -1,106 +1,204 @@
 <?php include 'db.php'; ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat User</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      color: #333;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+ <style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #e5e5e5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: flex-end;
+  }
+
+  #message-container {
+    background-color: #5f9ea0;
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%;
+    max-width: 600px; /* Limit the max width */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    position: relative;
+    margin: auto;
+  }
+
+  #output {
+    margin-top: 20px;
+    width: 100%;
+    height: calc(100% - 150px); 
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 15px;
+  }
+
+  .message {
+    padding: 12px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+    max-width: 80%;
+    display: inline-block;
+    position: relative;
+  }
+
+  .sent {
+    background-color: #4caf50;
+    align-self: flex-end;
+    color: white;
+    text-align: right;
+    border-radius: 20px;
+  }
+
+  .received {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    align-self: flex-start;
+    color: black;
+    text-align: left;
+    border-radius: 20px;
+  }
+
+  .message-time {
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 5px;
+    text-align: right;
+    padding-right: 5px;
+  }
+  .input-box {
+    width: 100%;
+    bottom: 0;
+
+  }
+
+  input[type="text"] {
+    width: 80%;
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    outline: none;
+    font-size: 16px;
+  }
+
+  button {
+    padding: 10px 15px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  .chat-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #fff;
+  }
+
+  .chat-header .name {
+    font-weight: bold;
+  }
+
+  @media (max-width: 768px) {
+    #message-container {
+      width: 100%; 
+      padding: 15px;
     }
 
-    #message-container {
-      background-color: #5f9ea0;
-      border-radius: 8px;
-      padding: 20px;
-      width: 300px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
+    .input-box {
+      flex-direction: column;
+      align-items: stretch;
     }
 
     input[type="text"] {
-      width: 80%;
+      width: 100%; 
+      margin-bottom: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+    }
+
+    .chat-header {
+      font-size: 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #message-container {
+      width: 100%; 
       padding: 10px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 4px;
+    }
+
+   
+
+    input[type="text"] {
+      padding: 8px;
       font-size: 14px;
     }
 
     button {
-      padding: 10px 15px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+      padding: 10px;
       font-size: 14px;
     }
 
-    button:hover {
-      background-color: #45a049;
+    .chat-header {
+      font-size: 14px;
     }
-
-    #output {
-      margin-top: 20px;
-      width: 100%;
-      max-height: 400px;
-      overflow-y: auto;
-      border-top: 1px solid #ddd;
-    }
-
-    .message {
-      background-color: #008ea1;
-      padding: 10px;
-      border-radius: 4px;
-      margin-bottom: 10px;
-      word-wrap: break-word;
-    }
-
-    .sent {
-      background-color: #c8e6c9;
-      align-self: flex-end;
-    }
-
-    .received {
-      background-color: #f1f8e9;
-    }
-
-    .right {
-      text-align: right;
-    }
-    .right {
-      text-align: left;
-    }
-
 
     .message-time {
-      font-size: 0.8em;
-      color: #888;
-      margin-top: 5px;
+      font-size: 0.7em;
+      color:black;
     }
+  }
+
+</style>
+
+
   </style>
 </head>
 
 <body>
   <form method="post">
     <div id="message-container">
-      <h2>Send a Message</h2>
+      <div class="chat-header">
+        <span class="name">Chat</span>
+      </div>
 
-      <input type="text" id="message" placeholder="Enter your message">
-      <button id="send-message" type="button">Send Message</button>
+      <!-- Message List -->
+      <div id="output"></div>
+
+      <!-- Input Box -->
+      <div class="input-box">
+        <input type="text" id="message" placeholder="Type a message..." />
+        <button id="send-message" type="button">Send</button>
+      </div>
     </div>
-
-    <div id="output"></div>
   </form>
 
   <script>
@@ -114,21 +212,6 @@
     const sender_number = urlParams.get('sender_number');
     const receiver_number = urlParams.get('receiver_number');
 
-    // fetch('getReceiverNumber.php', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/x-www-form-urlencoded'
-    //     },
-    //     body: new URLSearchParams({
-    //       sender_number: sender_number
-    //     }).toString() // Send the sender's number
-    //   })
-    //   .then(response => response.json())
-    //   .then(data => {
-    //     console.log(data);
-    //   })
-    //   .catch(error => console.error('Error:', error));
-
     ws.onopen = () => {
       console.log('Connected to the WebSocket server');
       ws.send(JSON.stringify({
@@ -137,16 +220,57 @@
       }));
     };
 
+    function fetchMessages() {
+      fetch(`get_messages.php?sender_number=${sender_number}&receiver_number=${receiver_number}`)
+        .then(response => response.json())
+        .then(messages => {
+          if (messages.length === 0) {
+            console.log('No messages found');
+            return;
+          }
+
+          messages.forEach(message => {
+            const messageDisplay = document.createElement('div');
+            messageDisplay.classList.add('message', message.sender_number === sender_number ? 'sent' : 'received');
+            messageDisplay.textContent = message.message;
+
+            const timestamp = document.createElement('span');
+            timestamp.classList.add('message-time');
+            timestamp.textContent = formatDate(new Date(message.timestamp * 1000));
+
+            messageDisplay.appendChild(timestamp);
+            outputElement.appendChild(messageDisplay);
+          });
+          outputElement.scrollTop = outputElement.scrollHeight;
+        })
+        .catch(error => console.error('Error fetching messages:', error));
+    }
+
+    function formatDate(timestamp) {
+      const date = new Date(timestamp);
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const hourFormatted = hours % 12 || 12;
+      const minuteFormatted = minutes < 10 ? '0' + minutes : minutes;
+      return `${hourFormatted}:${minuteFormatted} ${ampm}`;
+    }
+
     ws.onmessage = (message) => {
       const decodedMessage = JSON.parse(message.data);
-      console.log(decodedMessage);
-      if (decodedMessage.type === 'clientIdAck') {
-        messageContainer.style.display = 'block';
-      } else if (decodedMessage.type === 'private') {
-        const messageDisplay = document.createElement('p');
-        messageDisplay.classList.add('message', decodedMessage.from == null ? "left" : 'right');
-        messageDisplay.textContent = ` ${decodedMessage.from}`;
+
+      if (decodedMessage.type === 'private') {
+        const messageDisplay = document.createElement('div');
+        messageDisplay.classList.add('message', decodedMessage.from === sender_number ? 'sent' : 'received');
+        messageDisplay.textContent = decodedMessage.message;
+
+        const timestamp = document.createElement('span');
+        timestamp.classList.add('message-time');
+        timestamp.textContent = formatDate(new Date().getTime());
+
+        messageDisplay.appendChild(timestamp);
         outputElement.appendChild(messageDisplay);
+        outputElement.scrollTop = outputElement.scrollHeight;
       }
     };
 
@@ -154,7 +278,6 @@
       e.preventDefault();
       const message = messageInput.value;
 
-      // Payload to save the message in the database
       const payload = {
         sender_number,
         receiver_number,
@@ -162,23 +285,28 @@
       };
 
       if (message) {
+        const messageDisplay = document.createElement('div');
+        messageDisplay.classList.add('message', 'sent');
+        messageDisplay.textContent = message;
 
-        const messageDisplay = document.createElement('p');
-        messageDisplay.classList.add('message');
-        messageDisplay.textContent = ` ${message}`;
+        const timestamp = document.createElement('span');
+        timestamp.classList.add('message-time');
+        timestamp.textContent = formatDate(new Date().getTime());
+
+        messageDisplay.appendChild(timestamp);
         outputElement.appendChild(messageDisplay);
+        outputElement.scrollTop = outputElement.scrollHeight;
 
         fetch('save_message.php', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams(payload).toString()
-          })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams(payload).toString()
+        })
           .then(response => response.json())
           .then(data => {
             if (data.status === 'success') {
-
               ws.send(JSON.stringify({
                 type: 'private',
                 from: sender_number,
@@ -197,10 +325,11 @@
       }
     };
 
-
     ws.onclose = () => {
       console.log('Disconnected from the WebSocket server');
     };
+
+    fetchMessages();
   </script>
 </body>
 
