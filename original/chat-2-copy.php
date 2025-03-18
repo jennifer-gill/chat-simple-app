@@ -196,7 +196,7 @@ ws.onmessage = (message) => {
 
     const timestamp = document.createElement('span');
     timestamp.classList.add('message-time');
-    timestamp.textContent = formatDate(new Date().getTime()); 
+    timestamp.textContent = formatDate(message.created_at); 
 
     messageDisplay.appendChild(timestamp);
 
@@ -225,7 +225,7 @@ sendMessageButton.onclick = (e) => {
 
     const timestamp = document.createElement('span');
     timestamp.classList.add('message-time');
-    timestamp.textContent = formatDate(new Date().getTime()); 
+    timestamp.textContent = formatDate(message.created_at); 
 
     messageDisplay.appendChild(timestamp); 
     outputElement.appendChild(messageDisplay);

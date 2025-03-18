@@ -75,10 +75,11 @@
 
   .message-time {
     font-size: 0.8em;
-    color: #888;
+    color: black;
     margin-top: 5px;
     text-align: right;
     padding-right: 5px;
+    margin-left:5px;
   }
   .input-box {
     width: 100%;
@@ -171,10 +172,7 @@
       font-size: 14px;
     }
 
-    .message-time {
-      font-size: 0.7em;
-      color:black;
-    }
+   
   }
 
 </style>
@@ -236,7 +234,7 @@
 
             const timestamp = document.createElement('span');
             timestamp.classList.add('message-time');
-            timestamp.textContent = formatDate(new Date(message.timestamp * 1000));
+            timestamp.textContent = formatDate(new Date(message.created_at));
 
             messageDisplay.appendChild(timestamp);
             outputElement.appendChild(messageDisplay);
@@ -268,7 +266,7 @@
         timestamp.classList.add('message-time');
         timestamp.textContent = formatDate(new Date().getTime());
 
-        messageDisplay.appendChild(timestamp);
+        messageDisplay.appendChild(message.created_at);
         outputElement.appendChild(messageDisplay);
         outputElement.scrollTop = outputElement.scrollHeight;
       }
@@ -293,7 +291,7 @@
         timestamp.classList.add('message-time');
         timestamp.textContent = formatDate(new Date().getTime());
 
-        messageDisplay.appendChild(timestamp);
+        messageDisplay.appendChild(message.created_at);
         outputElement.appendChild(messageDisplay);
         outputElement.scrollTop = outputElement.scrollHeight;
 
