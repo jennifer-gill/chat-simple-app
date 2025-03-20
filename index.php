@@ -197,7 +197,7 @@ $result = $conn->query("SELECT * FROM contacts WHERE user_id = $user_id");
             background-color: #4a8283;
         }
 
- 
+
         .chat-window {
             position: fixed;
             bottom: 70px;
@@ -293,14 +293,32 @@ $result = $conn->query("SELECT * FROM contacts WHERE user_id = $user_id");
         .user-list .user-card:hover {
             background: rgba(255, 255, 255, 0.25);
         }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .status-indicator.online {
+            background-color: green;
+        }
+
+        .status-indicator.offline {
+            background-color: gray;
+        }
     </style>
 </head>
 
 <body>
+    <button id="logoutButton">Logout</button>
 
     <div class="container">
-        <h2>Users List</h2>
-        <a href="contact.php" class="add-user">Add New User <i class="fas fa-plus"></i></a>
+        <h2>Contacts List</h2>
+        <input type="hidden" id="sender_number" value="<?= $contact_number ?>">
+        <a href="contact.php" class="add-user">Add Contact <i class="fas fa-plus"></i></a>
 
         <div class="users-container">
             <?php while ($row = $result->fetch_assoc()): ?>
@@ -319,6 +337,9 @@ $result = $conn->query("SELECT * FROM contacts WHERE user_id = $user_id");
                     <div class="actions">
                         <a href="chat.php?receiver_number=<?= $row['contact_number'] ?>&sender_number=<?= $contact_number ?>" class="chat">
                             <i class="fas fa-comments"></i>
+                            <span data-client="<?= htmlspecialchars($row['contact_number'], ENT_QUOTES, 'UTF-8') ?>" class="status-indicator offline" id="status-<?= $row['contact_number'] ?>"></span>
+
+
                         </a>
                     </div>
                 </div>
@@ -354,35 +375,73 @@ $result = $conn->query("SELECT * FROM contacts WHERE user_id = $user_id");
     </div>
 
     <script>
-        function toggleChatWindow() {
-            const chatWindow = document.getElementById('chatWindow');
-            chatWindow.style.display = (chatWindow.style.display === 'flex') ? 'none' : 'flex';
-            chatWindow.style.opacity = (chatWindow.style.display === 'flex') ? '1' : '0';
+        const onlineClients = new Set(); // Store connected clients in memory
+
+        setInterval(() => {
+            const ws = new WebSocket('ws://localhost:7799');
+            let sender_number = document.getElementById("sender_number").value;
+
+            ws.onopen = () => {
+                console.log('Connected to WebSocket server');
+                ws.send(JSON.stringify({
+                    type: 'clientId',
+                    clientId: sender_number
+                }));
+            };
+
+            ws.onmessage = (message) => {
+                const decodedMessage = JSON.parse(message.data);
+
+                if (decodedMessage.type === "newClient") {
+                    if (!onlineClients.has(decodedMessage.clientId)) {
+                        onlineClients.add(decodedMessage.clientId);
+                        updateOnlineStatus(decodedMessage.clientId, true);
+                    }
+                }
+
+                if (decodedMessage.type === "clientDisconnected") {
+                    if (onlineClients.has(decodedMessage.clientId)) {
+                        onlineClients.delete(decodedMessage.clientId);
+                        updateOnlineStatus(decodedMessage.clientId, false);
+                    }
+                }
+
+                if (sender_number !== decodedMessage.clientId) {
+                    console.log(decodedMessage);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error("WebSocket Error:", error);
+            };
+
+            ws.onclose = () => {
+                console.log('Disconnected from WebSocket');
+            };
+        }, 5000);
+
+        // Function to update online/offline status
+        function updateOnlineStatus(clientId, isOnline) {
+            setTimeout(() => {
+                const clientElement = document.querySelector(`.status-indicator[data-client="${clientId}"]`);
+                if (clientElement) {
+                    clientElement.classList.toggle("online", isOnline);
+                    clientElement.classList.toggle("offline", !isOnline);
+                }
+            }, 100);
         }
 
-        function startChat(contactNumber) {
-           
-            window.location.href = `chat.php?receiver_number=${contactNumber}&sender_number=<?= $contact_number ?>`;
+        function logout(e) {
+            e.preventDefault();
+            onlineClients.clear(); // Clear clients on logout
+            console.log('Cleared connected clients.');
+            window.location.href = 'logout.php';
         }
 
-        document.getElementById('sendBtn').addEventListener('click', function () {
-            const inputField = document.getElementById('chatInput');
-            const message = inputField.value.trim();
-
-            if (message) {
-                const chatContent = document.getElementById('chatContent');
-
-                const messageElem = document.createElement('div');
-                messageElem.textContent = message;
-                messageElem.style.padding = '10px';
-                messageElem.style.margin = '5px 0';
-                messageElem.style.backgroundColor = '#5f9ea0';
-                messageElem.style.color = 'white';
-                messageElem.style.borderRadius = '5px';
-                chatContent.appendChild(messageElem);
-
-                inputField.value = '';
-                chatContent.scrollTop = chatContent.scrollHeight;
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutButton = document.getElementById("logoutButton");
+            if (logoutButton) {
+                logoutButton.addEventListener("click", logout);
             }
         });
     </script>
